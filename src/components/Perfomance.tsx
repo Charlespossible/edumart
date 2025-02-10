@@ -9,7 +9,7 @@ const Performance: React.FC = () => {
           <h3 className="font-semibold">Total Exams Taken</h3>
           <p className="text-lg font-bold">15</p>
         </div>
-        <div className="p-4 border rounded-md bg-green-100">
+        <div className="p-4 border rounded-md bg-[#97c966]">
           <h3 className="font-semibold">Average Score</h3>
           <p className="text-lg font-bold">82%</p>
         </div>
