@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateOTP , sendOTPEmail } from "../utils/OtpUtils";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
 
 // REGISTER FUNCTION
@@ -49,7 +50,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       process.env.JWT_SECRET!,
       { expiresIn: '3d' } // Token expires in 3 days
     );
-
+      console.log({token});
     res.status(201).json({ 
       message: "Registration successful! OTP sent to your email.",
       token // Include token if needed for other purposes
@@ -58,32 +59,68 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
+  //console.log(token)
 };
 
-// LOGIN FUNCTION
+//Login Function
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      res.status(400).json({ message: "Email and password are required" });
+      return;
+    }
+
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(404).json({ message: "User not found" });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(401).json({ message: "Incorrect password" });
       return;
-    } 
+    }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, { expiresIn: "1h" });
+    // Generate Tokens
+    const accessToken = generateAccessToken({ id: user.id, firstName: user.firstName, role: user.role });
+    const refreshToken = generateRefreshToken({ id: user.id, firstName: user.firstName, role: user.role });
 
-    res.json({ message: "Login successful", token });
+    // Send refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
+
+    res.status(200).json({ accessToken, user: { firstName: user.firstName, role: user.role } });
+
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+    res.status(500).json({ message: "Server error", error: errorMessage });
   }
 };
+
+// Refresh Token Endpoint
+export const refreshToken = async (req: Request, res: Response): Promise<void> => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res.status(401).json({ message: "Refresh token missing" });
+    return;
+  }
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, (err: any, user: any) => {
+    if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+    const newAccessToken = generateAccessToken({ id: user.id, firstName: user.firstName, role: user.role });
+    res.json({ accessToken: newAccessToken });
+  });
+};
+
+// Logout Endpoint
+export const logout = (req: Request, res: Response) => {
+  res.clearCookie("refreshToken");
+  res.json({ message: "Logged out successfully" });
+};
+
 
 //OTP Verification
 

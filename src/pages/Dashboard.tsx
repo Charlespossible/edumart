@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaChartLine, FaTrophy, FaClipboardList } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import StatsCard from "../components/StatsCard";
-import Profile from "../components/Profile"; // Import Profile component
-import Performance from "../components/Perfomance"; // Import Performance component
+import Profile from "../components/Profile";
+import Performance from "../components/Perfomance";
+import { AuthContext } from "../components/AuthContext";
 
 const Dashboard: React.FC = () => {
+  const auth = useContext(AuthContext);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
 
@@ -14,6 +17,13 @@ const Dashboard: React.FC = () => {
 
   const openPerformanceModal = () => setIsPerformanceModalOpen(true);
   const closePerformanceModal = () => setIsPerformanceModalOpen(false);
+
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  // Fetch the user's first name from localStorage
+  //const firstName = localStorage.getItem("user");
+
+  console.log({ user });
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -27,16 +37,37 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
         <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-lg font-semibold">Welcome, User</h1>
-          <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">Start New Exam</button>
+          <h1 className="text-lg font-semibold">
+            {" "}
+            {auth?.user ? (
+              <h1>Welcome {auth.user.firstName}</h1>
+            ) : (
+              <h1>Loading...</h1>
+            )}
+          </h1>
+          <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">
+            Start New Exam
+          </button>
         </header>
 
         {/* Dashboard Content */}
         <main className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Stats Cards */}
-          <StatsCard icon={<FaChartLine className="text-[#97c966] text-3xl" />} title="Total Exams" value="12" />
-          <StatsCard icon={<FaTrophy className="text-[#97c966] text-3xl" />} title="Highest Score" value="98%" />
-          <StatsCard icon={<FaClipboardList className="text-[#97c966] text-3xl" />} title="Exams Passed" value="9" />
+          <StatsCard
+            icon={<FaChartLine className="text-[#97c966] text-3xl" />}
+            title="Total Exams"
+            value="12"
+          />
+          <StatsCard
+            icon={<FaTrophy className="text-[#97c966] text-3xl" />}
+            title="Highest Score"
+            value="98%"
+          />
+          <StatsCard
+            icon={<FaClipboardList className="text-[#97c966] text-3xl" />}
+            title="Exams Passed"
+            value="9"
+          />
         </main>
       </div>
 

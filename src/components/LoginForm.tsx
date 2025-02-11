@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useContext } from "react";
 import { LoginFormData, LoginFormProps } from "../types/LoginForm";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthContext } from "../components/AuthContext";
 
 const LoginForm: React.FC<LoginFormProps> = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -17,6 +18,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+
+    // Check if user is already logged in
+    useEffect(() => {
+      if (auth?.user) {
+        navigate("/dashboard"); // Redirect to dashboard if already authenticated
+      }
+    }, [auth, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,7 +64,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       const loginUser = async () => {
         try {
           const response = await axios.post("http://localhost:5000/api/auth/login", formData);
-          toast.success(response.data.message || "Login successful!");
+          auth?.login(response.data.token, response.data.user);
+          toast.success(response.data.message || "Login successful!");     
           setTimeout(() => navigate("/dashboard"), 6000); // Redirect to dashboard after 3 seconds
         } catch (error: any) {
           toast.error(error.response?.data?.message || "Login failed");
