@@ -13,7 +13,7 @@ const Testimonial: React.FC<TestimonialProps> = ({ testimonials }) => {
           What Our Users Say
         </h2>
         <p className="mt-4 text-lg text-gray-600">
-          See how we've helped students excel in their exams!
+          Students, teachers and parents have good things to say about Edumart.
         </p>
       </div>
       <div className="mt-12 grid gap-8 lg:grid-cols-3">

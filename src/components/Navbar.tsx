@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import EdumartLogo from "../assets/images/EdumartLogo.png";
-//import "./Nav.css";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -159,7 +158,7 @@ const Navbar: React.FC = () => {
                 to="/"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-[#97c966] hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-[#97c966]" : ""
                   }`
                 }
@@ -170,7 +169,7 @@ const Navbar: React.FC = () => {
                 to="/about"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-[#97c966] hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-[#97c966]" : ""
                   }`
                 }
@@ -181,7 +180,7 @@ const Navbar: React.FC = () => {
                 to="/exams"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -192,7 +191,7 @@ const Navbar: React.FC = () => {
                 to="/pricing"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -203,7 +202,7 @@ const Navbar: React.FC = () => {
                 to="/leaderboard"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -214,7 +213,7 @@ const Navbar: React.FC = () => {
                 to="/register"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -225,7 +224,7 @@ const Navbar: React.FC = () => {
                 to="/login"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -236,7 +235,7 @@ const Navbar: React.FC = () => {
                 to="/contact"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-gray-600 hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f]  ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }

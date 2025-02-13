@@ -53,7 +53,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData);
+      const response = await axios.post("/login", formData);
       auth?.login(response.data.token, response.data.user);
       toast.success(response.data.message || "Login successful!");
       setTimeout(() => navigate("/dashboard"), 2000);
