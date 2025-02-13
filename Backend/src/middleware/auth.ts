@@ -1,21 +1,25 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET as string;
+interface AuthRequest extends Request {
+  user?: { id: string; firstName: string; role: string };
+}
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.header("Authorization");
-  if (!authHeader) return res.status(401).json({ message: "Access Denied. No token provided." });
+  const token = authHeader && authHeader.split(" ")[1];
 
-  const token = authHeader.split(" ")[1]; // Bearer Token
-  if (!token) return res.status(401).json({ message: "Invalid token format" });
+  if (!token) return res.status(401).json({ message: "Access denied" });
 
   try {
-    const verified = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    (req as any).user = verified; // Attach user info to request
+    if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing");
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: string; firstName: string; role: string };
+    req.user = decoded;
     next();
+
   } catch (error) {
-    res.status(403).json({ message: "Invalid or expired token" });
+    console.error("Token Verification Error:", error);
+    res.status(403).json({ message: "Invalid token" });
   }
 };
-// Compare this snippet from Backend/src/controllers/auth.ts:

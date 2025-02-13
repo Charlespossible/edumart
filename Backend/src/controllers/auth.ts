@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateOTP , sendOTPEmail } from "../utils/OtpUtils";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { generateAccessToken, generateRefreshToken } from "../utils/Jwt";
 
 
 // REGISTER FUNCTION
@@ -47,7 +47,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Generate JWT token (valid for 3 days)
     const token = jwt.sign(
       { userId: newUser.id },
-      process.env.JWT_SECRET!,
+      process.env.jWT_SECRET!,
       { expiresIn: '3d' } // Token expires in 3 days
     );
       console.log({token});
@@ -59,7 +59,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
-  //console.log(token)
+  
 };
 
 //Login Function
@@ -88,34 +88,57 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const accessToken = generateAccessToken({ id: user.id, firstName: user.firstName, role: user.role });
     const refreshToken = generateRefreshToken({ id: user.id, firstName: user.firstName, role: user.role });
 
-    // Send refresh token as HTTP-only cookie
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
+    // Send tokens as HTTP-only cookies
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
 
-    res.status(200).json({ accessToken, user: { firstName: user.firstName, role: user.role } });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
+    // Ensure the response includes the firstName field
+    res.status(200).json({
+      message: "Login successful",
+      user: { firstName: user.firstName, role: user.role },
+    });
   } catch (error) {
     const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
     res.status(500).json({ message: "Server error", error: errorMessage });
   }
 };
 
-// Refresh Token Endpoint
+//  Refresh Token Controller
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
-    res.status(401).json({ message: "Refresh token missing" });
-    return;
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      res.status(401).json({ message: "No refresh token, please login" });
+      return;
+    }
+    if (!process.env.JWT_REFRESH_SECRET) throw new Error("JWT_REFRESH_SECRET is missing");
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err: any, decoded: any) => {
+      if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+      const newAccessToken = generateAccessToken({ id: decoded.id, firstName: decoded.firstName, role: decoded.role });
+      res.json({ accessToken: newAccessToken });
+    });
+
+  } catch (error) {
+    console.error("Refresh Token Error:", error);
+    const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+    res.status(500).json({ message: "Server error", error: errorMessage });
   }
-
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, (err: any, user: any) => {
-    if (err) return res.status(403).json({ message: "Invalid refresh token" });
-
-    const newAccessToken = generateAccessToken({ id: user.id, firstName: user.firstName, role: user.role });
-    res.json({ accessToken: newAccessToken });
-  });
 };
 
-// Logout Endpoint
+//  Logout Controller
 export const logout = (req: Request, res: Response) => {
   res.clearCookie("refreshToken");
   res.json({ message: "Logged out successfully" });

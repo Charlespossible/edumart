@@ -1,36 +1,45 @@
-import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
 import { FaChartLine, FaTrophy, FaClipboardList } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import StatsCard from "../components/StatsCard";
 import Profile from "../components/Profile";
 import Performance from "../components/Perfomance";
-import { AuthContext } from "../components/AuthContext";
+import { AuthContext } from "../context/AuthContext";
+import Cookies from "js-cookie";
 
 const Dashboard: React.FC = () => {
   const auth = useContext(AuthContext);
+  const [user, setUser] = useState(auth?.user || null);
+  const [loading, setLoading] = useState(true);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
 
-  const openProfileModal = () => setIsProfileModalOpen(true);
-  const closeProfileModal = () => setIsProfileModalOpen(false);
+  useEffect(() => {
+    if (auth?.user) {
+      setUser(auth.user);
+      setLoading(false);
+    } else {
+      const firstName = Cookies.get("firstName");
+      const role = Cookies.get("role");
+  
+      console.log("Cookies retrieved in Dashboard:", { firstName, role }); // Debugging
+  
+      if (firstName && role) {
+        setUser({ firstName, role });
+      }
+      setLoading(false);
+    }
+  }, [auth?.user]);
+  
+  //console.log("Cookies retrieved:", { firstName, role });
 
-  const openPerformanceModal = () => setIsPerformanceModalOpen(true);
-  const closePerformanceModal = () => setIsPerformanceModalOpen(false);
-
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  // Fetch the user's first name from localStorage
-  //const firstName = localStorage.getItem("user");
-
-  console.log({ user });
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <Sidebar
-        openProfileModal={openProfileModal}
-        openPerformanceModal={openPerformanceModal}
+        openProfileModal={() => setIsProfileModalOpen(true)}
+        openPerformanceModal={() => setIsPerformanceModalOpen(true)}
       />
 
       {/* Main Content */}
@@ -38,12 +47,7 @@ const Dashboard: React.FC = () => {
         {/* Navbar */}
         <header className="bg-white shadow p-4 flex justify-between items-center">
           <h1 className="text-lg font-semibold">
-            {" "}
-            {auth?.user ? (
-              <h1>Welcome {auth.user.firstName}</h1>
-            ) : (
-              <h1>Loading...</h1>
-            )}
+            {loading ? "Loading..." : `Welcome ${auth?.user?.firstName}`}
           </h1>
           <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">
             Start New Exam
@@ -77,7 +81,7 @@ const Dashboard: React.FC = () => {
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <Profile />
             <button
-              onClick={closeProfileModal}
+              onClick={() => setIsProfileModalOpen(false)}
               className="mt-4 bg-[#97c966] text-white px-4 py-2 rounded-md"
             >
               Close
@@ -92,7 +96,7 @@ const Dashboard: React.FC = () => {
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <Performance />
             <button
-              onClick={closePerformanceModal}
+              onClick={() => setIsPerformanceModalOpen(false)}
               className="mt-4 bg-[#97c966] text-white px-4 py-2 rounded-md"
             >
               Close

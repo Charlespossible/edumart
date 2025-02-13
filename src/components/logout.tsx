@@ -5,12 +5,12 @@ const Logout: React.FC = ()=> {
     const handleLogout = () => {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("user");
-        navigate("/login");
+        //navigate("/login");
       };
 
     return (
         <div>
-            onClick={handleLogout};
+            onClick={};
         </div>
         )
 }

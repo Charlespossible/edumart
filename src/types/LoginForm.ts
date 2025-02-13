@@ -7,9 +7,4 @@ export interface LoginFormData {
     onSubmit: (data: LoginFormData) => void;
   }
 
-  export interface user{
-    id: string;
-    email: string;
-    name: string;
-  }
-  
+ 
