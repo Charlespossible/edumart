@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateOTP , sendOTPEmail } from "../utils/OtpUtils";
+import { generateOTP , sendOTPEmail  } from "../utils/OtpUtils";
 import { generateAccessToken, generateRefreshToken } from "../utils/Jwt";
 
 
@@ -42,24 +42,23 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     // Send OTP to user's email
-    await sendOTPEmail(email, otp); // Implement email sending logic
+    await sendOTPEmail(email, otp);
 
     // Generate JWT token (valid for 3 days)
     const token = jwt.sign(
       { userId: newUser.id },
-      process.env.jWT_SECRET!,
-      { expiresIn: '3d' } // Token expires in 3 days
+      process.env.JWT_SECRET!,
+      { expiresIn: "3d" } // Token expires in 3 days
     );
-      console.log({token});
+
     res.status(201).json({ 
       message: "Registration successful! OTP sent to your email.",
-      token // Include token if needed for other purposes
+      token, // Include token if needed for other purposes
     });
-
   } catch (error) {
+    console.error("Registration error:", error);
     res.status(500).json({ message: "Server error", error });
   }
-  
 };
 
 //Login Function

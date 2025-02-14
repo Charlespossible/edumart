@@ -72,7 +72,7 @@ model ExamResult {
 
 enum Role {
   USER
-  ADMIN
+  ADMIN 
 }
 
 
