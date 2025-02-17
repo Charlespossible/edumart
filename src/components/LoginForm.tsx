@@ -131,7 +131,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           </div>
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-[#97c966] rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="w-full px-4 py-2 text-white bg-[#97c966] rounded-lg hover:bg-green- disabled:opacity-50"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Logging in..." : "Login"}

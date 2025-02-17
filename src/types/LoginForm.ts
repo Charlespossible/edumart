@@ -9,7 +9,8 @@ export interface LoginFormData {
 
   export interface user {
     id: number;
-    name: string;
+    firtName: string;
+    lastName: string;
     email: string;
     phone: string;
   }
