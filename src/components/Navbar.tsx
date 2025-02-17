@@ -145,7 +145,7 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden bg-[#97c966] py-4"> 
             <div className="flex flex-col space-y-2 mt-4">
               <NavLink
                 to="/"

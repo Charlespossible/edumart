@@ -14,7 +14,7 @@ const UsersTable: React.FC = () => {
   }, []);
 
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -39,7 +39,7 @@ const UsersTable: React.FC = () => {
         <tbody>
           {filteredUsers.map((user) => (
             <tr key={user.id} className="border-t">
-              <td className="p-3">{user.name}</td>
+              <td className="p-3">{user.firstName}</td>
               <td className="p-3">{user.email}</td>
               <td className="p-3">
                 <button className="text-blue-500 hover:underline">Edit</button>
