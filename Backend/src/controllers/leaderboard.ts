@@ -16,7 +16,7 @@ export const getBestPerformers = async (req: Request, res: Response): Promise<vo
         },
         exam: {
           select: {
-            subject: true, 
+            subjectName: true, 
           },
         },
         score: true,
@@ -41,7 +41,7 @@ export const getBestPerformers = async (req: Request, res: Response): Promise<vo
       if (!performersMap.has(userName)) {
         performersMap.set(userName, { name: userName, subjects: [], scores: [] });
       }
-      performersMap.get(userName)?.subjects.push(result.exam.subject); // Add the subject
+      performersMap.get(userName)?.subjects.push(result.exam.subjectName); // Add the subject
       performersMap.get(userName)?.scores.push(result.score); // Add the score
     });
 

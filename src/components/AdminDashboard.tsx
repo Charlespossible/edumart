@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  FaUserCog,
   FaUsers,
   FaClipboardList,
   FaQuestionCircle,

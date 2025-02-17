@@ -11,6 +11,7 @@ const OTPVerificationPage: React.FC = () => {
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
+    //const storedName = localStorage.getItem("firstName");
     if (!storedEmail) {
       navigate("/register");
     } else {
@@ -24,7 +25,7 @@ const OTPVerificationPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", { email, otp });
+      const response = await axios.put("http://localhost:5000/api/auth/verifyOTP", { email, otp });
       toast.success(response.data.message || "OTP verified successfully!");
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("user", JSON.stringify(response.data.user));

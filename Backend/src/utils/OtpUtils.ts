@@ -31,3 +31,5 @@ export const generateOTP = (): string => {
       throw new Error("Failed to send OTP email");
     }
   };
+
+  

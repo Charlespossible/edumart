@@ -23,6 +23,9 @@ import Sidebar from "./pages/admin/Sidebar";
 import UsersTable from "./pages/admin/UsersTable";
 import UploadQuestions from "./pages/admin/UploadQuestions";
 import CreateAdmin from "./pages/admin/CreateAdmin";
+import Logout from "./pages/Logout";
+import Protected from "./components/Protected";
+import Forgotpassword from "./pages/Forgotpassword";
 //import ProtectedRoute from "./components/ProtectedRoute";
 
 const App: React.FC = () => {
@@ -35,14 +38,18 @@ const App: React.FC = () => {
       <Route path="/leaderboard" element={<Myleaderboard />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgotpassword" element={<Forgotpassword />} />
       <Route path="/contact" element={<Contact />} />
+      <Route element={<Protected />}>
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/profile" element={<Myprofile />} />
+      </Route>
+      <Route path="/dashboard/profile" element={<Myprofile />} />
       <Route path="/otp-verification" element={<OTPVerificationPage />} />
-      <Route path="/performance" element={<Myperfomance />} />
-      <Route path="/exam-history" element={<MyexamHistory />} />
+      <Route path="/dashboard/performance" element={<Myperfomance />} />
+      <Route path="/dashboard/exam-history" element={<MyexamHistory />} />
       <Route path="/user-leaderboard" element={<MyuserLeaderboard />} />
       <Route path="/settings" element={<Mysetting />} />
+      <Route path="/logout" element={<Logout />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/adminlogin" element={<AdminLogin />} />
       <Route path="/admin/sidebar" element={<Sidebar />} />

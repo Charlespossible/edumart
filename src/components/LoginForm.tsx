@@ -11,17 +11,21 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
   useEffect(() => {
-    if (auth?.user) {
-      navigate("/dashboard");
+    const storedEmail = localStorage.getItem("email");
+    //const storedName = localStorage.getItem("firstName");
+    if (!storedEmail) {
+      navigate("/register");
     }
-  }, [auth, navigate]);
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,10 +57,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post("/login", formData);
-      auth?.login(response.data.token, response.data.user);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData
+      );
+      auth?.login(response.data.accessToken, response.data.user);
       toast.success(response.data.message || "Login successful!");
-      setTimeout(() => navigate("/dashboard"), 2000);
+      localStorage.setItem("isLoggedIn", "true");
+      const storedAccessToken = response.data.accessToken; 
+      localStorage.setItem("accessToken", storedAccessToken);
+      console.log("Access Token Stored:", storedAccessToken);
+      //localStorage.setItem("email", JSON.stringify(response.data.user.email));
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      setTimeout(() => navigate("/dashboard"), 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
@@ -67,10 +80,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center text-[#97c966] mb-6">Login</h1>
+        <h1 className="text-2xl font-bold text-center text-[#97c966] mb-6">
+          Login
+        </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-[#78846f] mb-2">Email Address</label>
+            <label htmlFor="email" className="block text-[#78846f] mb-2">
+              Email Address
+            </label>
             <input
               type="text"
               id="email"
@@ -81,10 +98,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-[#97c966]"
               required
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
           <div>
-            <label htmlFor="password" className="block text-[#78846f] mb-2">Password</label>
+            <label htmlFor="password" className="block text-[#78846f] mb-2">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -104,7 +125,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
           <button
             type="submit"
@@ -115,7 +138,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           </button>
         </form>
         <p className="text-center text-[#78846f] mt-4">
-          Don't have an account? <a href="/register" className="text-[#97c966] hover:underline">Register</a>
+          Don't have an account?{" "}
+          <a href="/register" className="text-[#97c966] hover:underline">
+            Register
+          </a>
+        </p>
+        <p className="text-center text-[#78846f] mt-2">
+          <a href="/forgotpassword" className="text-[#97c966] hover:underline">
+            Forgot Password?
+          </a>
         </p>
       </div>
       <ToastContainer position="top-right" autoClose={2000} />

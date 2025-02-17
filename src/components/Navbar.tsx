@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom"; 
 import EdumartLogo from "../assets/images/EdumartLogo.png";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  // Handle Get Started button click
+  const handleGetStarted = () => {
+    navigate("/login"); // Redirect to the login page
   };
 
   return (
@@ -25,7 +31,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-12">
+          <div className="hidden md:flex space-x-12 items-center">
             <NavLink
               to="/"
               className={({ isActive }) =>
@@ -57,16 +63,6 @@ const Navbar: React.FC = () => {
               Exams
             </NavLink>
             <NavLink
-              to="/pricing"
-              className={({ isActive }) =>
-                `font-normal text-lg text-white hover:text-[#78846f]  ${
-                  isActive ? "font-normal text-blue-500" : ""
-                }`
-              }
-            >
-              Pricing
-            </NavLink>
-            <NavLink
               to="/leaderboard"
               className={({ isActive }) =>
                 `font-normal text-lg text-white hover:text-[#78846f]  ${
@@ -77,25 +73,14 @@ const Navbar: React.FC = () => {
               LeaderBoard
             </NavLink>
             <NavLink
-              to="/register"
+              to="/pricing"
               className={({ isActive }) =>
                 `font-normal text-lg text-white hover:text-[#78846f]  ${
                   isActive ? "font-normal text-blue-500" : ""
                 }`
               }
             >
-              Register
-            </NavLink>
-
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `font-normal text-lg text-white hover:text-[#78846f]  ${
-                  isActive ? "font-normal text-blue-500" : ""
-                }`
-              }
-            >
-              Login
+              Pricing
             </NavLink>
             <NavLink
               to="/contact"
@@ -107,13 +92,21 @@ const Navbar: React.FC = () => {
             >
               Contact
             </NavLink>
+
+            {/* Get Started Button */}
+            <button
+              onClick={handleGetStarted}
+              className="bg-white text-[#97c966] font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
+            >
+              Get Started
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="font-normal text-lg text-white hover:text-[#78846f]  focus:outline-none"
+              className="font-extrabold text-lg text-white hover:text-[#78846f]  focus:outline-none"
             >
               {isOpen ? (
                 <svg
@@ -188,17 +181,6 @@ const Navbar: React.FC = () => {
                 Exams
               </NavLink>
               <NavLink
-                to="/pricing"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
-                    isActive ? "font-normal text-blue-500" : ""
-                  }`
-                }
-              >
-                Pricing
-              </NavLink>
-              <NavLink
                 to="/leaderboard"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
@@ -210,7 +192,7 @@ const Navbar: React.FC = () => {
                 Leaderboard
               </NavLink>
               <NavLink
-                to="/register"
+                to="/pricing"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
                   `text-white hover:text-[#78846f]  ${
@@ -218,18 +200,7 @@ const Navbar: React.FC = () => {
                   }`
                 }
               >
-                Register
-              </NavLink>
-              <NavLink
-                to="/login"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
-                    isActive ? "font-normal text-blue-500" : ""
-                  }`
-                }
-              >
-                Login
+                Pricing
               </NavLink>
               <NavLink
                 to="/contact"
@@ -242,6 +213,16 @@ const Navbar: React.FC = () => {
               >
                 Contact
               </NavLink>
+              {/* Get Started Button for Mobile */}
+              <button
+                onClick={() => {
+                  handleGetStarted();
+                  setIsOpen(false);
+                }}
+                className="bg-white text-[#97c966] font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
+              >
+                Get Started
+              </button>
             </div>
           </div>
         )}

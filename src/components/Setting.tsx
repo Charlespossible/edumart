@@ -5,8 +5,6 @@ const Settings: React.FC = () => {
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("johndoe@example.com");
   const [password, setPassword] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
 
   // Handle form submission
   const handleSave = (e: React.FormEvent) => {
@@ -52,27 +50,7 @@ const Settings: React.FC = () => {
           />
         </div>
 
-        {/* Dark Mode Toggle */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            className="mr-2"
-          />
-          <label className="text-gray-700">Enable Dark Mode</label>
-        </div>
-
-        {/* Notification Toggle */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={notifications}
-            onChange={() => setNotifications(!notifications)}
-            className="mr-2"
-          />
-          <label className="text-gray-700">Receive Email Notifications</label>
-        </div>
+        {/* Dark Mode */}
 
         {/* Save Button */}
         <button

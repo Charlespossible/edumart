@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type FormData = {
   name: string;
@@ -7,12 +10,12 @@ type FormData = {
 };
 
 const ContactUs: React.FC = () => {
-  // State for the form data
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle input changes
   const handleInputChange = (
@@ -23,11 +26,20 @@ const ContactUs: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
-    // Reset the form
-    setFormData({ name: "", email: "", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/contact   ", formData);
+      toast.success(response.data.message); // Show success toast
+      setFormData({ name: "", email: "", message: "" }); // Reset the form
+    } catch (error) {
+      toast.error("Failed to send message. Please try again."); // Show error toast
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -71,7 +83,7 @@ const ContactUs: React.FC = () => {
       {/* Contact Form */}
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
         <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        We would love to hear from you.
+          We would love to hear from you.
         </h3>
         <hr className="border-b-2 border-[#97c966] mt-2 mb-5 w-10 mx-auto" ></hr>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -130,13 +142,27 @@ const ContactUs: React.FC = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-[#97c966] text-white px-6 py-3 rounded-md shadow-md hover:bg-[#97c966] transition duration-300"
+              disabled={isSubmitting}
+              className="bg-[#97c966] text-white px-6 py-3 rounded-md shadow-md hover:bg-[#97c966] transition duration-300 disabled:opacity-50"
             >
-              Send Message
+              {isSubmitting ? "Sending..." : "Send Message"}
             </button>
           </div>
         </form>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

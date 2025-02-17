@@ -5,12 +5,19 @@ import { FaUser, FaChartLine, FaClipboardList, FaTrophy, FaCog, FaSignOutAlt } f
 interface SidebarProps {
   openProfileModal: () => void;
   openPerformanceModal: () => void;
+  openExamHistoryModal: () => void;
+  openSettingsModal: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ openProfileModal, openPerformanceModal }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  openProfileModal,
+  openPerformanceModal,
+  openExamHistoryModal,
+  openSettingsModal,
+}) => {
   return (
-    <aside className="w-64 bg-[#97c966] text-white hidden md:flex flex-col p-4">
-      <h2 className="text-xl font-bold mb-6">Exam Dashboard</h2>
+    <aside className="w-64 bg-[#97c966] text-white flex-col p-4">
+      <h2 className="text-xl font-bold mb-6">User Dashboard</h2>
       <nav>
         <ul className="space-y-4">
           <li>
@@ -18,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ openProfileModal, openPerformanceModa
               onClick={openProfileModal}
               className="flex items-center space-x-3 hover:text-gray-300 w-full text-left"
             >
-              <FaUser /> <span>Profile</span>
+              <FaUser className="text-white" /> <span>Profile</span>
             </button>
           </li>
           <li>
@@ -26,27 +33,31 @@ const Sidebar: React.FC<SidebarProps> = ({ openProfileModal, openPerformanceModa
               onClick={openPerformanceModal}
               className="flex items-center space-x-3 hover:text-gray-300 w-full text-left"
             >
-              <FaChartLine /> <span>Performance</span>
+              <FaChartLine className="text-white" /> <span>Performance</span>
             </button>
           </li>
           <li>
-            <NavLink to="/exam-history" className="flex items-center space-x-3 hover:text-gray-300">
-              <FaClipboardList /> <span>Exam History</span>
-            </NavLink>
+            <button
+              onClick={openExamHistoryModal}
+              className="flex items-center space-x-3 hover:text-gray-300 w-full text-left"
+            >
+              <FaClipboardList className="text-white" /> <span>Exam History</span>
+            </button>
           </li>
           <li>
-            <NavLink to="/user-leaderboard" className="flex items-center space-x-3 hover:text-gray-300">
-              <FaTrophy /> <span>Leaderboard</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/settings" className="flex items-center space-x-3 hover:text-gray-300">
-              <FaCog /> <span>Settings</span>
-            </NavLink>
+            <button
+              onClick={openSettingsModal}
+              className="flex items-center space-x-3 hover:text-gray-300 w-full text-left"
+            >
+              <FaCog className="text-white" /> <span>Settings</span>
+            </button>
           </li>
           <li className="mt-6">
-            <NavLink to="/logout" className="flex items-center space-x-3 hover:text-gray-300">
-              <FaSignOutAlt /> <span>Logout</span>
+            <NavLink
+              to="/logout"
+              className="flex items-center space-x-3 hover:text-gray-300 w-full text-left"
+            >
+              <FaSignOutAlt className="text-white" /> <span>Logout</span>
             </NavLink>
           </li>
         </ul>
