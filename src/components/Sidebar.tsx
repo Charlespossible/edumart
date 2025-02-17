@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaUser, FaChartLine, FaClipboardList, FaTrophy, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaChartLine, FaClipboardList, FaCog, FaSignOutAlt } from "react-icons/fa";
 
 interface SidebarProps {
   openProfileModal: () => void;

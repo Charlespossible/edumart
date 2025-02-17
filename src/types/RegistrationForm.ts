@@ -12,4 +12,15 @@ export interface IREGISTER   {
   export interface RegistrationFormProps {
     onSubmit: (data: IREGISTER ) => void;
   }
+
+  export interface RegistrationFormData{
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    referer?: string; 
+    otp?: string;
+    password: string;
+    confirmPassword: string;
+  }
   

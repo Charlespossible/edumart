@@ -2,9 +2,6 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   FaUser,
-  FaChartLine,
-  FaClipboardList,
-  FaTrophy,
   FaCog,
   FaSignOutAlt,
   FaUpload,

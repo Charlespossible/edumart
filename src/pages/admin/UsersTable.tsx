@@ -7,7 +7,7 @@ const UsersTable: React.FC = () => {
 
   useEffect(() => {
     // Fetch users from the backend
-    fetch("https://jsonplaceholder.typicode.com/users")
+    fetch("http://localhost:5000/api/admin/users")
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((error) => console.error("Error fetching users:", error));
