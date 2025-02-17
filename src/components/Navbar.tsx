@@ -219,7 +219,7 @@ const Navbar: React.FC = () => {
                   handleGetStarted();
                   setIsOpen(false);
                 }}
-                className="bg-white text-[#97c966] font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
+                className="bg-[#97c966] text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
               >
                 Get Started
               </button>
