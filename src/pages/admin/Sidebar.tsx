@@ -10,7 +10,8 @@ import {
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-64 bg-[#97c966] text-white hidden md:flex flex-col p-4">
+    
+    <aside className="w-64 bg-[#97c966] text-white hidden md:flex flex-col p-4 h-full">
       <h2 className="text-xl font-bold mb-6">Admin Dashboard</h2>
       <nav>
         <ul className="space-y-4">
@@ -61,3 +62,5 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+
+

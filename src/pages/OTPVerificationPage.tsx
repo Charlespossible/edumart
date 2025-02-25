@@ -12,6 +12,7 @@ const OTPVerificationPage: React.FC = () => {
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     //const storedName = localStorage.getItem("firstName");
+    console.log(storedEmail);
     if (!storedEmail) {
       navigate("/register");
     } else {

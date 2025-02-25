@@ -16,7 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   openSettingsModal,
 }) => {
   return (
-    <aside className="w-64 bg-[#97c966] text-white flex-col p-4">
+    <aside className="w-64 bg-[#97c966] text-white h-full flex flex-col p-4">
       <h2 className="text-xl font-bold mb-6">User Dashboard</h2>
       <nav>
         <ul className="space-y-4">

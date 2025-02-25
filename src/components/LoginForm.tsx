@@ -21,10 +21,11 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
+    console.log(storedEmail);
     //const storedName = localStorage.getItem("firstName");
-    if (!storedEmail) {
+     /*if (!storedEmail) {
       navigate("/register");
-    }
+    }*/
   }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +68,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       const storedAccessToken = response.data.accessToken; 
       localStorage.setItem("accessToken", storedAccessToken);
       console.log("Access Token Stored:", storedAccessToken);
-      //localStorage.setItem("email", JSON.stringify(response.data.user.email));
+      const Myemail = response.data.user.email;
+      localStorage.setItem("email", Myemail);
+      console.log(Myemail);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       setTimeout(() => navigate("/dashboard"), 3000);
     } catch (error: any) {

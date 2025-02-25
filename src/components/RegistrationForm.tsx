@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IREGISTER, RegistrationFormProps } from "../types/RegistrationForm";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,8 +18,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = () => {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefererDisabled, setIsRefererDisabled] = useState(false); // New state for disabling referer field
   const navigate = useNavigate();
+  const location = useLocation(); // Hook to access URL query parameters
 
+  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -28,6 +31,16 @@ const RegistrationForm: React.FC<RegistrationFormProps> = () => {
       setErrors({ ...errors, [name]: "" });
     }
   };
+
+  // Check for referral query parameter on mount
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const refEmail = queryParams.get("ref");
+    if (refEmail) {
+      setFormData((prev) => ({ ...prev, referer: refEmail }));
+      setIsRefererDisabled(true); // Disable the referer field
+    }
+  }, [location.search]);
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -55,12 +68,15 @@ const RegistrationForm: React.FC<RegistrationFormProps> = () => {
     setIsSubmitting(true);
   };
 
-  //  handle the API call
+  // Handle the API call
   useEffect(() => {
     if (isSubmitting) {
       const registerUser = async () => {
         try {
-          const response = await axios.post("http://localhost:5000/api/auth/register", formData);
+          const response = await axios.post(
+            "http://localhost:5000/api/auth/register",
+            formData
+          );
           toast.success(response.data.message || "Registration successful!");
           localStorage.setItem("email", formData.email); // Store email for OTP verification
           setTimeout(() => navigate("/otp-verification"), 3000); // Redirect to OTP page
@@ -177,10 +193,10 @@ const RegistrationForm: React.FC<RegistrationFormProps> = () => {
               name="referer"
               value={formData.referer}
               onChange={handleChange}
-              placeholder="Who refered you"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#97c966]"
+              placeholder="Who referred you"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#97c966] disabled:bg-gray-100"
+              disabled={isRefererDisabled} // Disable when referral link is used
             />
-            
           </div>
 
           {/* Password */}
@@ -238,15 +254,15 @@ const RegistrationForm: React.FC<RegistrationFormProps> = () => {
         </form>
 
         <p className="text-center text-[#78846f] mt-4">
-                 Already have an account?{" "}
-                 <a href="/login" className="text-[#97c966] hover:underline">
-                   Login
-                 </a>
-               </p>
-             </div>
-             <ToastContainer position="top-right" autoClose={6000} />
-           </div>
-         );
-       };
-       
-       export default RegistrationForm;
+          Already have an account?{" "}
+          <a href="/login" className="text-[#97c966] hover:underline">
+            Login
+          </a>
+        </p>
+      </div>
+      <ToastContainer position="top-right" autoClose={6000} />
+    </div>
+  );
+};
+
+export default RegistrationForm;

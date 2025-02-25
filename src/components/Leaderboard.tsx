@@ -15,9 +15,12 @@ const Leaderboard: React.FC = () => {
     const fetchLeaderboard = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/auth/leaderboard");
-        setLeaderboard(response.data);
+        console.log(response.data); // Debugging: Check the API response
+        setLeaderboard(response.data); // Update if the response is nested
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
+        // Display an error message to the user
+        return <div className="text-center py-8">Failed to load leaderboard. Please try again later.</div>;
       } finally {
         setLoading(false);
       }
@@ -30,8 +33,12 @@ const Leaderboard: React.FC = () => {
     return <div className="text-center py-8">Loading...</div>;
   }
 
+  if (leaderboard.length === 0) {
+    return <div className="text-center py-8">No data available.</div>;
+  }
+
   return (
-    <div className="bg-gray-100 py-12 px-4">
+    <div className="bg-gray-100 min-h-screen py-12 px-4">
       <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
         Top Performers
         <hr className="border-b-4 border-[#97c966] mt-4 mb-8 w-48 mx-auto"></hr>

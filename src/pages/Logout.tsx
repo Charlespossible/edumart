@@ -11,6 +11,8 @@ const Logout: React.FC = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    //localStorage.removeItem("isLoggedIn");
+    //localStorage.removeItem("email");
 
     // Notify the user
     toast.success("You have been logged out successfully!", {
@@ -35,3 +37,15 @@ const Logout: React.FC = () => {
 };
 
 export default Logout;
+
+
+
+/*const handleLogout = async () => {
+  try {
+    await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+    auth?.logout();
+    navigate("/login");
+  } catch (error) {
+    console.error("Logout failed", error);
+  }
+};*/

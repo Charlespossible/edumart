@@ -26,7 +26,10 @@ import CreateAdmin from "./pages/admin/CreateAdmin";
 import Logout from "./pages/Logout";
 import Protected from "./components/Protected";
 import Forgotpassword from "./pages/Forgotpassword";
-//import ProtectedRoute from "./components/ProtectedRoute";
+import QuizPage from "./pages/QuizPage";
+import ExamPage from "./pages/ExamPage";
+
+
 
 const App: React.FC = () => {
   return (
@@ -37,6 +40,8 @@ const App: React.FC = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/leaderboard" element={<Myleaderboard />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/quiz" element={<QuizPage />} />
+      <Route path="/exam" element={<ExamPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgotpassword" element={<Forgotpassword />} />
       <Route path="/contact" element={<Contact />} />

@@ -1,18 +1,42 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import EdumartLogo from "../assets/images/EdumartLogo.png";
 
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [isOpen, setIsOpen] = useState(false); // For mobile menu toggle
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Tracks login status
+  const [userFirstName, setUserFirstName] = useState(""); // Stores user's first name
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For dropdown visibility
+  const navigate = useNavigate();
 
+  // Check login status on component mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserFirstName(user.firstName);
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  // Toggle mobile menu
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Handle Get Started button click
+  // Handle "Get Started" button click
   const handleGetStarted = () => {
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUserFirstName("");
+    navigate("/login");
   };
 
   return (
@@ -53,7 +77,7 @@ const Navbar: React.FC = () => {
               About
             </NavLink>
             <NavLink
-              to="/exams"
+              to="/exam"
               className={({ isActive }) =>
                 `font-normal text-lg text-white hover:text-[#78846f]  ${
                   isActive ? "font-normal text-blue-500" : ""
@@ -93,20 +117,62 @@ const Navbar: React.FC = () => {
               Contact
             </NavLink>
 
-            {/* Get Started Button */}
-            <button
-              onClick={handleGetStarted}
-              className="bg-white text-[#97c966] font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
-            >
-              Get Started
-            </button>
+            {/* Conditional Rendering based on login status */}
+            {isLoggedIn ? (
+              <div
+                className="relative"
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
+              >
+                <div className="flex items-center space-x-2 cursor-pointer">
+                  <span className="text-white font-semibold">{userFirstName}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                </div>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                    <button
+                      onClick={() => navigate("/dashboard")}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={handleGetStarted}
+                className="bg-white text-[#97c966] font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
+              >
+                Get Started
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="font-extrabold text-lg text-white hover:text-[#78846f]  focus:outline-none"
+              className="font-extrabold text-lg text-white hover:text-[#78846f] focus:outline-none"
             >
               {isOpen ? (
                 <svg
@@ -145,13 +211,13 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden bg-[#97c966] py-4"> 
+          <div className="md:hidden bg-[#97c966] py-4">
             <div className="flex flex-col space-y-2 mt-4">
               <NavLink
                 to="/"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-[#97c966]" : ""
                   }`
                 }
@@ -162,7 +228,7 @@ const Navbar: React.FC = () => {
                 to="/about"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-[#97c966]" : ""
                   }`
                 }
@@ -170,10 +236,10 @@ const Navbar: React.FC = () => {
                 About
               </NavLink>
               <NavLink
-                to="/exams"
+                to="/exam"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -184,7 +250,7 @@ const Navbar: React.FC = () => {
                 to="/leaderboard"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -195,7 +261,7 @@ const Navbar: React.FC = () => {
                 to="/pricing"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
@@ -206,23 +272,71 @@ const Navbar: React.FC = () => {
                 to="/contact"
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `text-white hover:text-[#78846f]  ${
+                  `text-white hover:text-[#78846f] ${
                     isActive ? "font-normal text-blue-500" : ""
                   }`
                 }
               >
                 Contact
               </NavLink>
-              {/* Get Started Button for Mobile */}
-              <button
-                onClick={() => {
-                  handleGetStarted();
-                  setIsOpen(false);
-                }}
-                className="bg-[#97c966] text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
-              >
-                Get Started
-              </button>
+
+              {/* Conditional rendering for mobile menu */}
+              {isLoggedIn ? (
+                <div className="relative">
+                  <div
+                    className="flex items-center justify-between px-4 py-2 text-white cursor-pointer"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  >
+                    <span>{userFirstName}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </div>
+                  {isDropdownOpen && (
+                    <div className="mt-2 space-y-2">
+                      <button
+                        onClick={() => {
+                          navigate("/dashboard");
+                          setIsOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-white hover:bg-[#78846f]"
+                      >
+                        Dashboard
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-white hover:bg-[#78846f]"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    handleGetStarted();
+                    setIsOpen(false);
+                  }}
+                  className="bg-[#97c966] text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
           </div>
         )}

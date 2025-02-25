@@ -11,25 +11,20 @@ const AdminDashboard: React.FC = () => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Navbar */}
-        <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-          <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">Logout</button>
-        </header>
-
-        {/* Dashboard Content */}
-        <main className="p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Manage Users</h2>
-          <UsersTable />
-
-          <h2 className="text-xl font-semibold">Upload Questions</h2>
-          <UploadQuestions />
-
-          <h2 className="text-xl font-semibold">Create Admin User</h2>
-          <CreateAdmin />
-        </main>
-      </div>
+      <div className="flex-1 flex flex-col bg-white">
+  <header className="shadow p-4 flex justify-between items-center">
+    <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+    <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">Logout</button>
+  </header>
+  <main className="p-6 space-y-6">
+    <h2 className="text-xl font-semibold">Manage Users</h2>
+    <UsersTable />
+    <h2 className="text-xl font-semibold">Upload Questions</h2>
+    <UploadQuestions />
+    <h2 className="text-xl font-semibold">Create Admin User</h2>
+    <CreateAdmin />
+  </main>
+</div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateOTP , sendOTPEmail  } from "../utils/OtpUtils";
+import { generateOTP } from "../utils/OtpUtils";
 import { generateAccessToken, generateRefreshToken } from "../utils/Jwt";
 
 
@@ -43,7 +43,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     // Send OTP to user's email
-    await sendOTPEmail(email, otp);
+    //await sendOTPEmail(email, otp);
+    console.log(otp);
 
     // Generate JWT token (valid for 3 days)
     const token = jwt.sign(
@@ -108,7 +109,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: "Login successful",
       accessToken,
       refreshToken,
-      user: {id: user.id, firstName: user.firstName, lastName: user.lastName, role: user.role },
+      user: {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role },
     });
   } catch (error) {
     const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
@@ -229,3 +230,83 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+// Fetch User Details Endpoint
+export const Setting = async (req:Request, res: Response):Promise<void> => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    res.status(400).json({ error: "User ID is required." });
+    return;
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return ;
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ error: "An error occurred while fetching user details." });
+  }
+};
+
+// Update User Details Endpoint
+export const Getuser = async (req: Request, res: Response):Promise<void> => {
+  const { userId } = req.params;
+  const { firstName, lastName, phone } = req.body;
+
+  if (!userId) {
+    res.status(400).json({ error: "User ID is required." });
+    return ;
+  }
+
+  try {
+    // Fetch the user
+    const user = await prisma.user.findUnique({
+      where: { id:userId },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return ;
+    }
+
+    // Update user details
+    const updatedUser = await prisma.user.update({
+      where: { id:userId },
+      data: {
+        firstName: firstName || user.firstName, // Use existing value if not provided
+        lastName: lastName || user.lastName, // Use existing value if not provided
+        phoneNumber: phone || user.phoneNumber, // Use existing value if not provided
+      },
+    });
+
+    res.status(200).json({
+      message: "User details updated successfully.",
+      user: {
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phone: updatedUser.phoneNumber,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    res.status(500).json({ error: "An error occurred while updating user details." });
+  }
+};
+

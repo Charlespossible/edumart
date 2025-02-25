@@ -11,6 +11,7 @@ interface AuthProviderProps {
 interface User {
   firstName: string;
   lastName: string;
+  email: string;
   role: string;
 }
 
@@ -47,13 +48,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error("No user data received");
       }
   
-      const { firstName, lastName, role } = response.data.user;
+      const { firstName, lastName,  role } = response.data.user;
       console.log("Extracted User Data:", { firstName, lastName, role })
       // Store user data in cookies
       Cookies.set("firstName", firstName, { secure: false, sameSite: "Lax", path: "/" });
       Cookies.set("role", role, { secure: false, sameSite: "Lax", path: "/" });
+      Cookies.set("role", email, { secure: false, sameSite: "Lax", path: "/" });
       console.log("Cookies Set:", Cookies.get("firstName"), Cookies.get("role")); 
-      setUser({ firstName, lastName, role });
+      setUser({ firstName, lastName, email, role });
   
       // Redirect to dashboard
       navigate("/dashboard");

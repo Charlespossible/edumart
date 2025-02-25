@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FaChartLine, FaTrophy, FaClipboardList } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import StatsCard from "../components/StatsCard";
 import Profile from "../components/Profile";
@@ -7,7 +8,9 @@ import Performance from "../components/Perfomance";
 import ExamHistory from "../components/ExamHistory";
 import { AuthContext } from "../context/AuthContext";
 import Setting from "../components/Setting";
-//import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const Dashboard: React.FC = () => {
   const auth = useContext(AuthContext);
@@ -15,40 +18,69 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
-  const [isExamHistoryModalOpen, setIsExamHistoryModalOpen] = useState(false); // State for Exam History modal
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false); // State for Settings modal
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to manage sidebar visibility
+  const [isExamHistoryModalOpen, setIsExamHistoryModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [referredCount, setReferredCount] = useState(0);
+  const [totalEarnings, setTotalEarnings] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    console.log(storedEmail);
     if (auth?.user) {
       setUser(auth.user);
       setLoading(false);
     } else {
-      //const firstName = Cookies.get("firstName");
-      //const role = Cookies.get("role");
       const storedUser = localStorage.getItem("user");
-      console.log(localStorage.getItem("accessToken"));
-      console.log(storedUser);
-
-  
-      //console.log("Cookies retrieved in Dashboard:", { firstName, role }); // Debugging
-  
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
       setLoading(false);
     }
   }, [auth?.user]);
-  
-  //console.log("Cookies retrieved:", { firstName, role });
-   // Toggle sidebar visibility
-   const toggleSidebar = () => {
+
+  useEffect(() => {
+    const fetchReferralStats = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/referrals/stats",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        setReferredCount(response.data.referredCount || 0);
+        setTotalEarnings(response.data.totalEarnings || 0);
+      } catch (error) {
+        toast.error("Failed to fetch referral stats");
+      }
+    };
+
+    if (!loading && user) {
+      fetchReferralStats();
+    }
+  }, [loading, user]);
+
+  const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleStartNewExam = () => {
+    navigate("/exams");
+  };
+
+  const handleCopyReferralLink = () => {
+    const referralLink = `${window.location.origin}/register?ref=${user?.email}`;
+    navigator.clipboard.writeText(referralLink);
+    toast.success("Referral link copied to clipboard!");
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
-       <div
+      {/* Sidebar */}
+      <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 md:relative`}
@@ -56,12 +88,11 @@ const Dashboard: React.FC = () => {
         <Sidebar
           openProfileModal={() => setIsProfileModalOpen(true)}
           openPerformanceModal={() => setIsPerformanceModalOpen(true)}
-          openExamHistoryModal={() => setIsExamHistoryModalOpen(true)} // Pass handler for Exam History
-          openSettingsModal={() => setIsSettingsModalOpen(true)} // Pass handler for Settings
+          openExamHistoryModal={() => setIsExamHistoryModalOpen(true)}
+          openSettingsModal={() => setIsSettingsModalOpen(true)}
         />
       </div>
 
-      {/* Overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -71,9 +102,7 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Navbar */}
         <header className="bg-white shadow p-4 flex justify-between items-center">
-          {/* Toggle Sidebar Button (Mobile Only) */}
           <button
             onClick={toggleSidebar}
             className="md:hidden text-gray-600 focus:outline-none"
@@ -93,38 +122,89 @@ const Dashboard: React.FC = () => {
               />
             </svg>
           </button>
-
           <h1 className="text-lg font-semibold">
-            {loading ? "Loading..." : `Welcome ${user?.firstName}  ${user?.lastName}` }
+            {loading
+              ? "Loading..."
+              : `Welcome ${user?.firstName} ${user?.lastName}`}
           </h1>
-          <button className="bg-[#97c966] text-white px-4 py-2 rounded-md">
+          <button
+            onClick={handleStartNewExam}
+            className="bg-[#97c966] text-white px-4 py-2 rounded-md hover:bg-[#85b35c] transition-colors"
+          >
             Start New Exam
           </button>
         </header>
 
-        {/* Dashboard Content */}
-        <main className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <main className="p-6">
           {/* Stats Cards */}
-          <StatsCard
-            icon={<FaChartLine className="text-[#97c966] text-3xl" />}
-            title="Total Exams"
-            value="12"
-          />
-          <StatsCard
-            icon={<FaTrophy className="text-[#97c966] text-3xl" />}
-            title="Highest Score"
-            value="98%"
-          />
-          <StatsCard
-            icon={<FaClipboardList className="text-[#97c966] text-3xl" />}
-            title="Exams Passed"
-            value="9"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <StatsCard
+              icon={<FaChartLine className="text-[#97c966] text-3xl" />}
+              title="Total Exams"
+              value="12"
+            />
+            <StatsCard
+              icon={<FaTrophy className="text-[#97c966] text-3xl" />}
+              title="Highest Score"
+              value="98%"
+            />
+            <StatsCard
+              icon={<FaClipboardList className="text-[#97c966] text-3xl" />}
+              title="Exams Passed"
+              value="9"
+            />
+          </div>
+
+          {/* Referral Section */}
+          {!loading && user && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Referral Link */}
+              <div className="p-4 bg-white rounded-lg shadow-md">
+                <h2 className="text-lg font-semibold mb-2 text-[#78846f]">
+                  Referral Link
+                </h2>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    value={`${window.location.origin}/register?ref=${user.email}`}
+                    readOnly
+                    className="flex-1 px-3 py-2 border rounded-l-lg bg-gray-50 text-sm focus:outline-none"
+                  />
+                  <button
+                    onClick={handleCopyReferralLink}
+                    className="bg-[#97c966] text-white px-4 py-2 rounded-r-lg hover:bg-[#85b35c] transition-colors"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              {/* Number of Referrals */}
+              <div className="p-4 bg-white rounded-lg shadow-md flex flex-col justify-between">
+                <h2 className="text-lg font-semibold mb-2 text-[#78846f]">
+                  Referrals
+                </h2>
+                <p className="text-2xl font-bold text-[#97c966]">
+                  {referredCount} Users
+                </p>
+              </div>
+
+              {/* Total Earnings */}
+              <div className="p-4 bg-white rounded-lg shadow-md flex flex-col justify-between">
+                <h2 className="text-lg font-semibold mb-2 text-[#78846f]">
+                  Total Earnings
+                </h2>
+                <p className="text-2xl font-bold text-[#97c966]">
+                  ₦{totalEarnings.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
-       {/* Profile Modal */}
-       {isProfileModalOpen && (
+      {/* Modals */}
+      {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <Profile />
@@ -137,8 +217,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Performance Modal */}
       {isPerformanceModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -152,8 +230,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Exam History Modal */}
       {isExamHistoryModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -167,8 +243,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Settings Modal */}
       {isSettingsModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -182,6 +256,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
