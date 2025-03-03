@@ -42,6 +42,35 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
+    // Handle referral creation if referer is provided
+    if (referer) {
+      try {
+        const referrer = await prisma.user.findUnique({
+          where: { email: referer },
+        });
+
+        if (referrer) {
+          // Generate random earnings between ₦500 and ₦2000 (inclusive)
+          const randomEarnings = Math.floor(Math.random() * (2000 - 500 + 1)) + 500;
+
+          // Create referral record
+          await prisma.referral.create({
+            data: {
+              referrerId: referrer.id,
+              referredId: newUser.id,
+              earnings: randomEarnings,
+            },
+          });
+        } else {
+          console.log(`Referrer with email ${referer} not found`);
+        }
+      } catch (referralError) {
+        console.error("Error creating referral:", referralError);
+        // Continue registration even if referral fails
+      }
+    }
+
+
     // Send OTP to user's email
     //await sendOTPEmail(email, otp);
     console.log(otp);
@@ -53,7 +82,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       { expiresIn: "3d" } // Token expires in 3 days
     );
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: "Registration successful! OTP sent to your email.",
       token, // Include token if needed for other purposes
     });
@@ -62,7 +91,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 //Login Function
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -265,34 +293,58 @@ export const Setting = async (req:Request, res: Response):Promise<void> => {
   }
 };
 
-// Update User Details Endpoint
-export const Getuser = async (req: Request, res: Response):Promise<void> => {
-  const { userId } = req.params;
-  const { firstName, lastName, phone } = req.body;
+// Get User Endpoint
+export const getUser = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
 
-  if (!userId) {
+  if (!id) {
     res.status(400).json({ error: "User ID is required." });
-    return ;
+    return;
   }
 
   try {
-    // Fetch the user
     const user = await prisma.user.findUnique({
-      where: { id:userId },
+      where: { id: id },
+      select: {
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+      },
     });
 
     if (!user) {
       res.status(404).json({ error: "User not found." });
-      return ;
+      return;
     }
 
-    // Update user details
+    res.status(200).json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phoneNumber,
+    });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ error: "An error occurred while fetching user details." });
+  }
+};
+
+// Update User Endpoint
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const { firstName, lastName, phone } = req.body;
+
+  if (!id) {
+    res.status(400).json({ error: "User ID is required." });
+    return;
+  }
+
+  try {
     const updatedUser = await prisma.user.update({
-      where: { id:userId },
+      where: { id: id },
       data: {
-        firstName: firstName || user.firstName, // Use existing value if not provided
-        lastName: lastName || user.lastName, // Use existing value if not provided
-        phoneNumber: phone || user.phoneNumber, // Use existing value if not provided
+        firstName: firstName !== undefined ? firstName : undefined,
+        lastName: lastName !== undefined ? lastName : undefined,
+        phoneNumber: phone !== undefined ? phone : undefined,
       },
     });
 

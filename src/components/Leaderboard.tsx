@@ -45,27 +45,27 @@ const Leaderboard: React.FC = () => {
       </h2>
       
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg shadow-lg">
-          <thead>
-            <tr className="bg-[#97c966] text-white">
-              <th className="py-3 px-4 text-center">Rank</th>
-              <th className="py-3 px-4 text-center">Name</th>
-              <th className="py-3 px-4 text-center">Best Subject</th>
-              <th className="py-3 px-4 text-center">Average Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.map((entry, index) => (
-              <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="py-3 px-4">{index + 1}</td>
-                <td className="py-3 px-4">{entry.name}</td>
-                <td className="py-3 px-4">{entry.bestSubject}</td>
-                <td className="py-3 px-4">{entry.averageScore}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table className="min-w-full bg-white rounded-lg shadow-lg">
+    <thead>
+      <tr className="bg-[#97c966] text-white">
+        <th className="py-3 px-4 text-center">Rank</th>
+        <th className="py-3 px-4 text-center">Name</th>
+        <th className="py-3 px-4 text-center">Best Subject</th>
+        <th className="py-3 px-4 text-center">Average Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {leaderboard.map((entry, index) => (
+        <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+          <td className="py-3 px-4 text-center">{index + 1}</td>
+          <td className="py-3 px-4 text-center">{entry.name}</td>
+          <td className="py-3 px-4 text-center">{entry.bestSubject}</td>
+          <td className="py-3 px-4 text-center">{entry.averageScore}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
   );
 };

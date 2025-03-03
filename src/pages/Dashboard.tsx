@@ -26,8 +26,6 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
-    console.log(storedEmail);
     if (auth?.user) {
       setUser(auth.user);
       setLoading(false);
@@ -44,7 +42,7 @@ const Dashboard: React.FC = () => {
     const fetchReferralStats = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/referrals/stats",
+          "http://localhost:5000/api/referrals/referral-stats",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

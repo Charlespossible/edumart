@@ -13,20 +13,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id        String     @id @default(uuid())
-  firstName   String   @default("Unknown") // Add a default value
-  lastName    String   @default("Unknown") // Add a default value
-  email     String     @unique
-  phoneNumber String   @default("0000000000")
-  password  String
-  referer   String? 
-  role       Role      @default(USER) 
-  createdAt DateTime @default(now())
-  exams      ExamResult[]
-  otp        String? 
+  id          String       @id @default(uuid())
+  firstName   String       @default("Unknown")
+  lastName    String       @default("Unknown")
+  email       String       @unique
+  phoneNumber String       @default("0000000000")
+  password    String
+  referer     String?      
+  role        Role         @default(USER)
+  createdAt   DateTime     @default(now())
+  exams       ExamResult[]
+  otp         String?
   otpExpires  DateTime?
-  resetToken String?
+  resetToken  String?
+  referrals   Referral[]   @relation("Referrer") // Referrals made by this user
+  referredBy  Referral[]   @relation("Referred") // Referrals where this user was referred
+}
+
+model Referral {
+  id          String   @id @default(uuid())
+  referrerId  String   // ID of the user who made the referral
+  referredId  String   // ID of the user who was referred
+  earnings    Float    // Earnings for this referral
+  createdAt   DateTime @default(now())
+  referrer    User     @relation("Referrer", fields: [referrerId], references: [id])
+  referred    User     @relation("Referred", fields: [referredId], references: [id])
 }
 
 model Admin {

@@ -37,7 +37,7 @@ const processSingleFile = async (filePath: string): Promise<ProcessedFileResult>
         if (!q.questionsGroupId) missingFields.push("questionsGroupId");
         if (!q.subjectName) missingFields.push("subjectName");
         if (!q.year || isNaN(parseInt(q.year))) missingFields.push("year (must be a number)");
-        //if (!q.question) missingFields.push("question");
+        if (!q.question) missingFields.push("question");
 
         if (missingFields.length > 0) {
           result.errors.push(`Row ${index + 1}: Missing or invalid ${missingFields.join(", ")}`);

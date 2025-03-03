@@ -26,7 +26,7 @@ const OTPVerificationPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put("http://localhost:5000/api/auth/verifyOTP", { email, otp });
+      const response = await axios.post("http://localhost:5000/api/auth/verifyOTP", { email, otp });
       toast.success(response.data.message || "OTP verified successfully!");
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("user", JSON.stringify(response.data.user));

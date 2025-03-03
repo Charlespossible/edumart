@@ -1,56 +1,104 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 
 const Settings: React.FC = () => {
-  // State for form inputs
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
+  const auth = useContext(AuthContext);
+  const [user, setUser] = useState(auth?.user || null);
+  const [formData, setFormData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const BASE_URL = "http://localhost:5000";
 
-  // Fetch user details on component mount
+  useEffect(() => {
+    if (auth?.user) {
+      setUser(auth.user);
+      setLoading(false);
+    } else {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      setLoading(false);
+    }
+  }, [auth?.user]);
+
   useEffect(() => {
     const fetchUserDetails = async () => {
+      if (!user?.id) {
+        return;
+      }
+      const Userid = user.id;
       setLoading(true);
       try {
-        const BASE_URL = "http://localhost:5000";
-      
-        const userId = 1; // Replace with the actual user ID (e.g., from authentication context)
-        const response = await axios.get(`${BASE_URL}api/auth/getUser/${userId}`);
-        const { firstName, lastName, phone } = response.data;
-        setFirstName(firstName);
-        setLastName(lastName);
-        setPhone(phone || ""); // Handle null phone number
+        const response = await axios.get(`${BASE_URL}/api/auth/get-user/${Userid}`, 
+            
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        });
+        setFormData({
+          id: Userid,
+          firstName: response.data.firstName,
+          lastName: response.data.lastName,
+          phone: response.data.phone || "",
+        });
       } catch (error) {
-        setMessage("Failed to fetch user details. Please try again.");
-        console.error("Error fetching user details:", error);
+        if (axios.isAxiosError(error)) {
+          console.error("Fetch error:", error.response?.status, error.response?.data || error.message);
+        } else {
+          console.error("Fetch error:", error);
+        }
+        const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || "Unknown error" : "Unknown error";
+        setMessage("Failed to fetch user details: " + errorMessage);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserDetails();
-  }, []);
+  }, [user?.id]);
 
-  // Handle form submission
-  const handleSave = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) {
+      setMessage("User authentication required");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
     try {
-      const userId = 1; // Replace with the actual user ID (e.g., from authentication context)
-      const response = await axios.put(`http://localhost:5000/api/auth/settings/${userId}`, {
-        firstName,
-        lastName,
-        phone,
-      });
+      const response = await axios.put(
+        `${BASE_URL}/api/auth/update-user/${user.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
 
       setMessage(response.data.message);
+      setFormData((prev) => ({
+        ...prev,
+        ...response.data.user,
+      }));
     } catch (error) {
-      setMessage("Failed to update settings. Please try again.");
-      console.error("Error updating settings:", error);
+      setMessage("Update failed. Please try again.");
+      console.error("Update error:", error);
     } finally {
       setLoading(false);
     }
@@ -59,44 +107,44 @@ const Settings: React.FC = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Settings</h2>
-      
-      <form onSubmit={handleSave} className="space-y-4">
-        {/* First Name */}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-gray-700">First Name</label>
           <input
             type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
             className="w-full p-2 border rounded mt-1"
             required
           />
         </div>
 
-        {/* Last Name */}
         <div>
           <label className="block text-gray-700">Last Name</label>
           <input
             type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
             className="w-full p-2 border rounded mt-1"
             required
           />
         </div>
 
-        {/* Phone */}
         <div>
           <label className="block text-gray-700">Phone Number</label>
           <input
             type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
             className="w-full p-2 border rounded mt-1"
+            /*pattern="[0-9]{10}"*/
           />
         </div>
 
-        {/* Save Button */}
         <button
           type="submit"
           disabled={loading}
@@ -105,8 +153,15 @@ const Settings: React.FC = () => {
           {loading ? "Saving..." : "Save Changes"}
         </button>
 
-        {/* Message */}
-        {message && <p className="mt-4 text-center text-green-600">{message}</p>}
+        {message && (
+          <p
+            className={`mt-4 text-center ${
+              message.includes("success") ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

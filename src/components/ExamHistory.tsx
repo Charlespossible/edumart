@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // Define TypeScript interface for exam data
 interface Exam {
@@ -9,15 +10,65 @@ interface Exam {
   status: "Pass" | "Fail";
 }
 
-// Dummy exam history data
-const examHistoryData: Exam[] = [
-  { id: 1, name: "Math Test", date: "2024-01-10", score: 85, status: "Pass" },
-  { id: 2, name: "Science Quiz", date: "2024-02-15", score: 72, status: "Pass" },
-  { id: 3, name: "History Exam", date: "2024-03-22", score: 45, status: "Fail" },
-  { id: 4, name: "English Test", date: "2024-04-05", score: 90, status: "Pass" },
-];
-
 const ExamHistory: React.FC = () => {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchExamHistory = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        console.log("Token:", token);
+        if (!token) {
+          throw new Error("No token found");
+        }
+        const response = await axios.get("http://localhost:5000/api/exam/exam-history", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        console.log("Response data:", response.data);
+        setExams(response.data);
+        if (response.data.length === 0) {
+          console.log("No exam history available");
+        }
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          if (err.response) {
+            console.error("API Error:", err.response.status, err.response.data);
+            setError(`Failed to fetch exam history: ${err.response.data.message || "Unknown error"}`);
+          } else if (err.request) {
+            console.error("Network Error:", err);
+            setError("Failed to fetch exam history: Network error");
+          } else {
+            console.error("Error:", err.message);
+            setError(`Failed to fetch exam history: ${err.message}`);
+          }
+        } else {
+          console.error("Unexpected Error:", err);
+          setError("Failed to fetch exam history: Unexpected error");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchExamHistory();
+  }, []);// Empty dependency array means it runs once on mount
+
+  // Handle loading state
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Handle error state
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Render the table with dynamic data
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Exam History</h2>
@@ -33,7 +84,7 @@ const ExamHistory: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {examHistoryData.map((exam) => (
+            {exams.map((exam) => (
               <tr key={exam.id} className="text-center">
                 <td className="py-2 px-4 border">{exam.name}</td>
                 <td className="py-2 px-4 border">{exam.date}</td>

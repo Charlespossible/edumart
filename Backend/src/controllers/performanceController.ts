@@ -16,21 +16,15 @@ declare global {
 const prisma = new PrismaClient();
 
 export const getPerformance = async (req: Request, res: Response):Promise<void> => {
-  // Get the authenticated user's ID (assumes auth middleware attaches user to req)
   const userId = req.user?.id;
-
   if (!userId) {
      res.status(401).json({ message: "Unauthorized" });
      return;
   }
-
   try {
-    // 1. Total exams taken
     const totalExams = await prisma.examResult.count({
       where: { userId },
     });
-
-    // 2. Average score across all exams
     const averageScoreResult = await prisma.examResult.aggregate({
       _avg: { score: true },
       where: { userId },

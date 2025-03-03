@@ -22,7 +22,7 @@ export const getBestPerformers = async (req: Request, res: Response): Promise<vo
         score: true,
       },
       orderBy: {
-        score: "desc", 
+        score: "asc", 
       },
       take: 10, 
     });

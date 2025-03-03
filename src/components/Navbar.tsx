@@ -3,13 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import EdumartLogo from "../assets/images/EdumartLogo.png";
 
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false); // For mobile menu toggle
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Tracks login status
-  const [userFirstName, setUserFirstName] = useState(""); // Stores user's first name
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // For dropdown visibility
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userFirstName, setUserFirstName] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const navigate = useNavigate();
 
-  // Check login status on component mount
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -21,12 +21,10 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
-  // Toggle mobile menu
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Handle "Get Started" button click
   const handleGetStarted = () => {
     navigate("/login");
   };
@@ -119,13 +117,14 @@ const Navbar: React.FC = () => {
 
             {/* Conditional Rendering based on login status */}
             {isLoggedIn ? (
-              <div
-                className="relative"
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
-              >
-                <div className="flex items-center space-x-2 cursor-pointer">
-                  <span className="text-white font-semibold">{userFirstName}</span>
+              <div className="relative">
+                <div
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span className="text-white font-semibold">
+                    {userFirstName}
+                  </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -144,13 +143,19 @@ const Navbar: React.FC = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                     <button
-                      onClick={() => navigate("/dashboard")}
+                      onClick={() => {
+                        navigate("/dashboard");
+                        setIsDropdownOpen(false);
+                      }}
                       className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                     >
                       Dashboard
                     </button>
                     <button
-                      onClick={handleLogout}
+                      onClick={() => {
+                        handleLogout();
+                        setIsDropdownOpen(false);
+                      }}
                       className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                     >
                       Logout
@@ -282,51 +287,53 @@ const Navbar: React.FC = () => {
 
               {/* Conditional rendering for mobile menu */}
               {isLoggedIn ? (
-                <div className="relative">
-                  <div
-                    className="flex items-center justify-between px-4 py-2 text-white cursor-pointer"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              <div className="relative">
+                <div
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span className="text-white font-semibold">
+                    {userFirstName}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 text-white"
                   >
-                    <span>{userFirstName}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
-                  </div>
-                  {isDropdownOpen && (
-                    <div className="mt-2 space-y-2">
-                      <button
-                        onClick={() => {
-                          navigate("/dashboard");
-                          setIsOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-white hover:bg-[#78846f]"
-                      >
-                        Dashboard
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-white hover:bg-[#78846f]"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
                 </div>
-              ) : (
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                    <button
+                      onClick={() => {
+                        navigate("/dashboard");
+                        setIsDropdownOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ): (
                 <button
                   onClick={() => {
                     handleGetStarted();

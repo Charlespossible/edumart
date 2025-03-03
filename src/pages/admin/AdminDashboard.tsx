@@ -1,6 +1,6 @@
 import React from "react";
 import Sidebar from "../admin/Sidebar";
-import UsersTable from "../admin/UsersTable"
+import UsersTable from "../admin/UsersTable";
 import UploadQuestions from "../admin/UploadQuestions";
 import CreateAdmin from "../admin/CreateAdmin";
 

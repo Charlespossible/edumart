@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { register, login, refreshToken, logout, getProfile, Setting, Getuser } from "../controllers/auth";
+import { register, login, refreshToken, logout, getProfile, Setting, getUser, updateUser } from "../controllers/auth";
 import { getBestPerformers } from "../controllers/leaderboard";
 import { verifyOTP } from "../utils/endpoint/verifyOTP";
 import { submitContactForm } from "../controllers/contact";
@@ -10,7 +10,9 @@ import { examTypes, subjects , years , Questions , validateAnswer} from "../cont
 import { submitExamResult } from "../controllers/examResultController";
 import { authenticate } from "../middleware/auth";
 import { getPerformance } from "../controllers/performanceController";
-
+import { getStats } from "../controllers/referral";
+import { getExamHistory } from "../controllers/examHistory";
+ 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
@@ -31,8 +33,11 @@ router.get("/years", years);
 router.get("/questions", Questions);
 router.post("/validate-answer", validateAnswer);
 router.post("/submit-result", submitExamResult);
-router.get("/getUser", Getuser);
+router.get("/get-user/:id", getUser);
 router.get("/performance", authenticate, getPerformance);
-router.put("/settings", Setting);
+router.get("/referral-stats", authenticate, getStats);
+router.get("/exam-history", authenticate, getExamHistory);
+//router.put("/settings", Setting);
+router.put("/update-user/:id", updateUser);
 
 export default router;

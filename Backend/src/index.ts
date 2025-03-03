@@ -19,6 +19,6 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", authRoutes);
 app.use("/api/exam", authRoutes);
-
+app.use("/api/referrals", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
